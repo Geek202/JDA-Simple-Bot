@@ -1,0 +1,3 @@
+rootProject.name = 'JDA-Simple-Bots'
+include 'TestBot'
+
