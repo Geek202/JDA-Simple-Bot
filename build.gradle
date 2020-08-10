@@ -1,25 +1,24 @@
-buildscript {
+/*buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath 'org.ajoberstar:gradle-git:0.8.0'
     }
-}
+}*/
 
 plugins {
     id 'java-library'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
     id 'maven-publish'
+    id "org.ajoberstar.grgit" version "1.7.2"
 }
-
-import org.ajoberstar.grgit.Grgit
 
 group 'me.geek.tom'
 
 String baseVersion = '1.0'
 
-String gitRev = Grgit.open(project.file('.')).head().abbreviatedId
+String gitRev = grgit.head().abbreviatedId
 version = baseVersion + "-git.${gitRev}"
 
 repositories {
