@@ -34,7 +34,7 @@ compileJava {
 
 dependencies {
     api 'com.mojang:brigadier:1.0.17'
-    api 'net.dv8tion:JDA:4.2.0_188'
+    api 'net.dv8tion:JDA:4.2.0_191'
     api 'com.beust:jcommander:1.71'
 
     implementation 'com.google.guava:guava:29.0-jre'
