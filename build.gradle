@@ -40,6 +40,11 @@ dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
 }
 
+task sourceJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
 jar {
     manifest {
         attributes([
@@ -55,6 +60,8 @@ jar {
     }
 }
 
+build.dependsOn('sourceJar')
+
 publishing {
     publications {
         maven(MavenPublication) {
@@ -65,6 +72,9 @@ publishing {
             from components.java
             artifact(shadowJar) {
                 classifier "all"
+            }
+            artifact(sourceJar) {
+                classifier 'sources'
             }
         }
     }

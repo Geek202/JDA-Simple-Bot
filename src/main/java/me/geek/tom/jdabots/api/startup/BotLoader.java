@@ -16,14 +16,21 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.security.auth.login.LoginException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class BotLoader extends ListenerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BotLoader.class);
 
     private final List<IExtension> extensions;
     private final Map<IExtension, List<CommandWrapper>> commands;
@@ -40,7 +47,7 @@ public class BotLoader extends ListenerAdapter {
     private void autoSubscribeEventListeners() {
         for (IExtension extension : extensions) {
             if (EventListener.class.isAssignableFrom(extension.getClass())) {
-                System.out.printf("Registering %s to the EventBus...%n", extension.getName());
+                LOGGER.info("Registering {} to the EventBus...", extension.getName());
                 eventBus.register((EventListener) extension);
             }
         }
@@ -49,7 +56,7 @@ public class BotLoader extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         handler.init(this);
-        System.out.println("Ready on " + event.getGuildAvailableCount() + " guilds!");
+        LOGGER.info("Ready on {} guilds!", event.getGuildAvailableCount());
     }
 
     @Override
@@ -66,6 +73,10 @@ public class BotLoader extends ListenerAdapter {
     }
 
     public static void main(String[] args) throws LoginException {
+        main(args, Collections.emptyList());
+    }
+
+    public static void main(String[] args, List<GatewayIntent> disabledIntents, GatewayIntent... intents) throws LoginException {
         Args arguments = new Args();
         try {
             JCommander.newBuilder()
@@ -83,15 +94,17 @@ public class BotLoader extends ListenerAdapter {
                 .collect(Collectors.toMap(ext -> ext, ExtensionLoader::readCommands));
 
         for (IExtension ext : allCommands.keySet()) {
-            System.out.println(ext.getName() + ": " + ext.getDescription());
+            LOGGER.info(ext.getName() + ": " + ext.getDescription());
             for (CommandWrapper wrapper : allCommands.get(ext)) {
-                System.out.println("\t" + wrapper.getName() + ": " + wrapper.getDescription() + " (" + wrapper.getCommand().getClass().getSimpleName() + ")");
+                LOGGER.info("\t" + wrapper.getName() + ": " + wrapper.getDescription() + " (" + wrapper.getCommand().getClass().getSimpleName() + ")");
             }
         }
 
         BotLoader loader = new BotLoader(extensions, allCommands);
         JDA builder = JDABuilder.createDefault(arguments.token)
                 .addEventListeners(loader, loader.getListener())
+                .disableIntents(disabledIntents)
+                .enableIntents(Arrays.asList(intents))
                 .build();
     }
 

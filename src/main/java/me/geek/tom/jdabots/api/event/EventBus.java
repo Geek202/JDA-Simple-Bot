@@ -1,6 +1,8 @@
 package me.geek.tom.jdabots.api.event;
 
-import java.lang.reflect.AccessibleObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class EventBus {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventBus.class);
     private final Map<EventListener, List<HandlerWrapper>> handlers = new ConcurrentHashMap<>();
 
     public void register(EventListener listener) {
@@ -35,8 +38,7 @@ public class EventBus {
                     try {
                         handler.method.invoke(entry.getKey(), event);
                     } catch (Exception e) {
-                        System.err.printf("Event handler %s#%s(%s) failed with exception: %n",
-                                entry.getKey().getClass().getName(), handler.method.getName(), handler.method.getParameterTypes()[0].getSimpleName());
+                        LOGGER.error(String.format("Event handler %s#%s(%s) failed with exception:", entry.getKey().getClass().getName(), handler.method.getName(), handler.method.getParameterTypes()[0].getSimpleName()), e);
                         e.printStackTrace();
                     }
                 }
