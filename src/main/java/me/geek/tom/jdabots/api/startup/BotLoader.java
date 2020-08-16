@@ -3,6 +3,7 @@ package me.geek.tom.jdabots.api.startup;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import me.geek.tom.jdabots.api.event.EventBus;
 import me.geek.tom.jdabots.api.event.EventListener;
 import me.geek.tom.jdabots.api.extension.IExtension;
@@ -37,6 +38,8 @@ public class BotLoader extends ListenerAdapter {
     private final CommandHandler handler = new CommandHandler();
 
     private final EventBus eventBus = new EventBus();
+
+    public static final EventWaiter EVENT_WAITER = new EventWaiter();
 
     public BotLoader(List<IExtension> extensions, Map<IExtension, List<CommandWrapper>> commands) {
         this.extensions = extensions;
@@ -76,6 +79,7 @@ public class BotLoader extends ListenerAdapter {
         main(args, Collections.emptyList());
     }
 
+    @SuppressWarnings("unused")
     public static void main(String[] args, List<GatewayIntent> disabledIntents, GatewayIntent... intents) throws LoginException {
         Args arguments = new Args();
         try {
@@ -102,7 +106,7 @@ public class BotLoader extends ListenerAdapter {
 
         BotLoader loader = new BotLoader(extensions, allCommands);
         JDA builder = JDABuilder.createDefault(arguments.token)
-                .addEventListeners(loader, loader.getListener())
+                .addEventListeners(loader, loader.getListener(), EVENT_WAITER)
                 .disableIntents(disabledIntents)
                 .enableIntents(Arrays.asList(intents))
                 .build();

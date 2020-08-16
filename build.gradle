@@ -38,6 +38,8 @@ dependencies {
     api 'com.beust:jcommander:1.71'
 
     implementation 'com.google.guava:guava:29.0-jre'
+
+    api 'com.jagrosh:jda-utilities-menu:3.0.4'
 }
 
 task sourceJar(type: Jar, dependsOn: classes) {
