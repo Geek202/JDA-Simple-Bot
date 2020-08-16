@@ -27,6 +27,7 @@ public class EventBus {
         this.handlers.put(listener, handlers);
     }
 
+    @SuppressWarnings("unused")
     public void unregister(EventListener listener) {
         handlers.remove(listener);
     }

@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.requests.RestAction;
 /**
  * Represents the context in which a command was executed.
  */
+@SuppressWarnings("unused")
 public class DiscordContext {
 
     private final Message message;
