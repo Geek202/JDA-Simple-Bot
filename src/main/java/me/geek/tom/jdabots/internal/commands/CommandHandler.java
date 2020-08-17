@@ -25,6 +25,16 @@ public class CommandHandler {
 
     private final CommandDispatcher<DiscordContext> dispatcher = new CommandDispatcher<>();
 
+    private final String botPrefix;
+
+    public CommandHandler() {
+        this(".");
+    }
+
+    public CommandHandler(String botPrefix) {
+        this.botPrefix = botPrefix;
+    }
+
     public void init(BotLoader loader) {
         dispatcher.register(literal("extensions").executes(ctx -> {
             StringBuilder builder = new StringBuilder().append("```\nAvailable extensions:\n\n");
@@ -40,7 +50,7 @@ public class CommandHandler {
                 builder.append(ext.getName()).append(": ").append(ext.getDescription()).append("\n");
                 List<CommandWrapper> commandList = commands.get(ext);
                 for (CommandWrapper cmd : commandList) {
-                    builder.append("\t.").append(cmd.getName()).append(": ").append(cmd.getDescription()).append("\n");
+                    builder.append("\t").append(botPrefix).append(cmd.getName()).append(": ").append(cmd.getDescription()).append("\n");
                 }
             }
 
@@ -85,17 +95,17 @@ public class CommandHandler {
                 });
 
         Arrays.stream(dispatcher.getAllUsage(dispatcher.getRoot(), ctx.getSource(), true))
-                .map(s -> "`."+s+"`")
+                .map(s -> "`"+botPrefix+s+"`")
                 .forEach(builder1::addItems);
         builder1.build().display(ctx.getSource().getChannel());
     }
 
     public void handleCommand(GuildMessageReceivedEvent event) {
         String msg = event.getMessage().getContentRaw();
-        if (!msg.startsWith(".")) return;
+        if (!msg.startsWith(botPrefix)) return;
 
         try {
-            dispatcher.execute(msg.substring(1), new DiscordContext(event.getMessage(), event.getAuthor(), event.getChannel()));
+            dispatcher.execute(msg.substring(botPrefix.length()), new DiscordContext(event.getMessage(), event.getAuthor(), event.getChannel()));
         } catch (CommandSyntaxException e) {
             event.getChannel().sendMessage(new EmbedBuilder()
                     .setTitle("Error!")

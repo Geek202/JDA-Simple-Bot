@@ -35,15 +35,16 @@ public class BotLoader extends ListenerAdapter {
 
     private final List<IExtension> extensions;
     private final Map<IExtension, List<CommandWrapper>> commands;
-    private final CommandHandler handler = new CommandHandler();
+    private final CommandHandler handler;
 
     private final EventBus eventBus = new EventBus();
 
     public static final EventWaiter EVENT_WAITER = new EventWaiter();
 
-    public BotLoader(List<IExtension> extensions, Map<IExtension, List<CommandWrapper>> commands) {
+    public BotLoader(List<IExtension> extensions, String botPrefix, Map<IExtension, List<CommandWrapper>> commands) {
         this.extensions = extensions;
         this.commands = commands;
+        this.handler = new CommandHandler(botPrefix);
         autoSubscribeEventListeners();
     }
 
@@ -76,11 +77,11 @@ public class BotLoader extends ListenerAdapter {
     }
 
     public static void main(String[] args) throws LoginException {
-        main(args, Collections.emptyList());
+        main(args, ".", Collections.emptyList());
     }
 
     @SuppressWarnings("unused")
-    public static void main(String[] args, List<GatewayIntent> disabledIntents, GatewayIntent... intents) throws LoginException {
+    public static void main(String[] args, String botPrefix, List<GatewayIntent> disabledIntents, GatewayIntent... intents) throws LoginException {
         Args arguments = new Args();
         try {
             JCommander.newBuilder()
@@ -104,7 +105,7 @@ public class BotLoader extends ListenerAdapter {
             }
         }
 
-        BotLoader loader = new BotLoader(extensions, allCommands);
+        BotLoader loader = new BotLoader(extensions, botPrefix, allCommands);
         JDA builder = JDABuilder.createDefault(arguments.token)
                 .addEventListeners(loader, loader.getListener(), EVENT_WAITER)
                 .disableIntents(disabledIntents)
