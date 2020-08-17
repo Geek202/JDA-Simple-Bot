@@ -101,6 +101,8 @@ public class CommandHandler {
     }
 
     public void handleCommand(GuildMessageReceivedEvent event) {
+        if (!event.getChannel().canTalk()) return;
+
         String msg = event.getMessage().getContentRaw();
         if (!msg.startsWith(botPrefix)) return;
 
